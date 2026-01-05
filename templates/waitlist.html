@@ -1,0 +1,521 @@
+{% extends "base.html" %}
+
+{% block title %}Join the Waitlist — Icarus{% endblock %}
+
+{% block extra_css %}
+<style>
+    /* Nav */
+    nav {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      z-index: 100;
+      padding: 1.5rem 4rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      mix-blend-mode: difference;
+    }
+
+    .logo {
+      font-family: 'Cormorant', serif;
+      font-size: 1.5rem;
+      font-weight: 400;
+      color: var(--cream);
+      letter-spacing: -0.01em;
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      text-decoration: none;
+    }
+
+    .logo-mark {
+      width: 36px;
+      height: 36px;
+      border: 1px solid currentColor;
+      border-radius: 4px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.125rem;
+      font-style: italic;
+    }
+
+    .nav-right {
+      display: flex;
+      align-items: center;
+      gap: 3rem;
+    }
+
+    .nav-links {
+      display: flex;
+      gap: 2.5rem;
+    }
+
+    .nav-links a {
+      color: var(--cream);
+      text-decoration: none;
+      font-size: 0.9375rem;
+      opacity: 0.7;
+      transition: opacity 0.2s ease;
+    }
+
+    .nav-links a:hover { opacity: 1; }
+
+    .nav-cta {
+      padding: 0.75rem 1.75rem;
+      background: var(--cream);
+      color: var(--forest);
+      border: none;
+      border-radius: 100px;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.875rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+      mix-blend-mode: normal;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .nav-cta:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+    }
+
+    /* Page layout */
+    .page {
+      min-height: 100vh;
+      display: grid;
+      grid-template-columns: 1fr 1.1fr;
+      position: relative;
+    }
+
+    .left {
+      padding: 8rem 4rem 4rem 8rem;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      position: relative;
+      z-index: 2;
+    }
+
+    .label {
+      font-family: 'Cormorant', serif;
+      font-size: 0.9375rem;
+      font-style: italic;
+      color: var(--gold);
+      margin-bottom: 1.75rem;
+      letter-spacing: 0.03em;
+      opacity: 0;
+      animation: fadeUp 1s ease 0.2s forwards;
+    }
+
+    h1 {
+      font-family: 'Cormorant', serif;
+      font-size: clamp(3rem, 5vw, 4.75rem);
+      font-weight: 300;
+      line-height: 1.05;
+      letter-spacing: -0.02em;
+      margin-bottom: 1.5rem;
+      opacity: 0;
+      animation: fadeUp 1s ease 0.4s forwards;
+    }
+
+    h1 em { font-style: italic; font-weight: 400; color: var(--terracotta); }
+
+    .sub {
+      font-size: 1.125rem;
+      color: var(--cream-muted);
+      max-width: 520px;
+      line-height: 1.8;
+      margin-bottom: 2.5rem;
+      opacity: 0;
+      animation: fadeUp 1s ease 0.6s forwards;
+    }
+
+    .card {
+      width: min(560px, 100%);
+      border: 1px solid rgba(245, 242, 235, 0.12);
+      border-radius: 24px;
+      background: rgba(245, 242, 235, 0.03);
+      box-shadow: 0 40px 80px rgba(0,0,0,0.20);
+      backdrop-filter: blur(10px);
+      padding: 1.75rem;
+      opacity: 0;
+      animation: fadeUp 1s ease 0.8s forwards;
+    }
+
+    .form {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 0.85rem;
+      margin-top: 0.75rem;
+    }
+
+    .row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0.75rem;
+    }
+
+    .field label {
+      display: block;
+      font-size: 0.875rem;
+      color: var(--cream-muted);
+      margin: 0.25rem 0 0.5rem;
+    }
+
+    input, select {
+      width: 100%;
+      padding: 1rem 1.25rem;
+      border: 1px solid var(--cream-faint);
+      border-radius: 100px;
+      background: transparent;
+      color: var(--cream);
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.9375rem;
+      transition: border-color 0.2s ease, background 0.2s ease, transform 0.2s ease;
+      appearance: none;
+    }
+
+    input::placeholder { color: var(--cream-faint); }
+
+    input:focus, select:focus {
+      outline: none;
+      border-color: var(--gold-muted);
+      background: rgba(245, 242, 235, 0.03);
+    }
+
+    select option { color: #111; }
+
+    .actions {
+      display: flex;
+      gap: 0.625rem;
+      align-items: center;
+      margin-top: 0.5rem;
+      flex-wrap: wrap;
+    }
+
+    .btn {
+      padding: 1rem 1.75rem;
+      border: none;
+      border-radius: 100px;
+      cursor: pointer;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.9375rem;
+      font-weight: 500;
+      transition: all 0.25s ease;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.6rem;
+      user-select: none;
+    }
+
+    .btn-primary {
+      background: var(--terracotta);
+      color: var(--cream);
+      min-width: 190px;
+    }
+
+    .btn-primary:hover {
+      background: var(--terracotta-dark);
+      transform: translateY(-2px);
+      box-shadow: 0 15px 40px rgba(196, 129, 106, 0.25);
+    }
+
+    .btn-ghost {
+      background: transparent;
+      color: var(--cream);
+      border: 1px solid rgba(245, 242, 235, 0.18);
+    }
+
+    .btn-ghost:hover {
+      background: rgba(245, 242, 235, 0.06);
+    }
+
+    .fineprint {
+      margin-top: 0.6rem;
+      font-size: 0.8125rem;
+      color: var(--cream-faint);
+      line-height: 1.6;
+    }
+
+    .fineprint a { 
+      color: var(--cream-muted); 
+      text-decoration: none; 
+      border-bottom: 1px solid rgba(245,242,235,0.15); 
+    }
+
+    .fineprint a:hover { 
+      color: var(--cream); 
+      border-bottom-color: rgba(245,242,235,0.35); 
+    }
+
+    .status {
+      margin-top: 0.9rem;
+      border-radius: 16px;
+      padding: 0.9rem 1rem;
+      border: 1px solid rgba(245, 242, 235, 0.12);
+      background: rgba(245, 242, 235, 0.03);
+      display: none;
+    }
+
+    .status strong {
+      font-family: 'Cormorant', serif;
+      font-weight: 500;
+      letter-spacing: -0.01em;
+    }
+
+    .status p { 
+      margin-top: 0.25rem; 
+      color: var(--cream-muted); 
+      font-size: 0.9375rem; 
+    }
+
+    /* Right visual */
+    .right {
+      position: relative;
+      overflow: hidden;
+    }
+
+    .painting {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      opacity: 0;
+      transform: scale(1.05);
+      animation: paintingReveal 1.5s ease 0.3s forwards;
+      filter: saturate(0.95) contrast(1.02);
+    }
+
+    .overlay {
+      position: absolute;
+      inset: 0;
+      background:
+        linear-gradient(to right, var(--forest) 0%, transparent 30%),
+        linear-gradient(to top, var(--forest) 0%, transparent 25%),
+        radial-gradient(ellipse at 80% 30%, rgba(196,129,106,0.10) 0%, transparent 60%);
+      pointer-events: none;
+    }
+
+    .caption {
+      position: absolute;
+      bottom: 3rem;
+      right: 3rem;
+      font-family: 'Cormorant', serif;
+      font-size: 0.875rem;
+      font-style: italic;
+      color: var(--cream);
+      opacity: 0.6;
+      text-align: right;
+      line-height: 1.5;
+    }
+
+    .rule {
+      margin-top: 1.5rem;
+      height: 1px;
+      background: linear-gradient(to right, var(--gold-muted), transparent);
+      max-width: 320px;
+      opacity: 0;
+      animation: fadeUp 1s ease 1s forwards;
+    }
+
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(30px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes paintingReveal {
+      from { opacity: 0; transform: scale(1.1); }
+      to   { opacity: 1; transform: scale(1); }
+    }
+
+    /* Responsive */
+    @media (max-width: 1024px) {
+      nav { padding: 1.25rem 2rem; }
+      .page { grid-template-columns: 1fr; }
+      .left {
+        padding: 10rem 2rem 3rem;
+        text-align: center;
+        align-items: center;
+      }
+      .card { margin-inline: auto; text-align: left; }
+      .right { height: 50vh; min-height: 420px; }
+      .caption { bottom: 2rem; right: 2rem; }
+      .nav-links { display: none; }
+    }
+
+    @media (max-width: 600px) {
+      h1 { font-size: 2.6rem; }
+      .row { grid-template-columns: 1fr; }
+      .btn-primary { width: 100%; }
+      .btn-ghost { width: 100%; }
+      .actions { width: 100%; }
+      .card { padding: 1.25rem; border-radius: 20px; }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<nav>
+  <a href="{{ url_for('index') }}" class="logo" aria-label="Icarus Home">
+    <div class="logo-mark">ι</div>
+    icarus
+  </a>
+
+  <div class="nav-right">
+    <div class="nav-links">
+      <a href="{{ url_for('index') }}#manifesto">Manifesto</a>
+    </div>
+    <a class="nav-cta" href="{{ url_for('index') }}">← Back</a>
+  </div>
+</nav>
+
+<main class="page">
+  <section class="left" aria-labelledby="title">
+    <p class="label">Limited access · human-made only</p>
+
+    <h1 id="title">Join the <em>waitlist</em></h1>
+    <p class="sub">
+      We're opening slowly to protect the culture. Leave your details and we'll reach out when it's your turn.
+    </p>
+
+    <div class="card" role="region" aria-label="Waitlist form">
+      <form class="form" id="waitlistForm" novalidate>
+        <div class="row">
+          <div class="field">
+            <label for="name">Name</label>
+            <input id="name" name="name" type="text" placeholder="Your name" autocomplete="name" />
+          </div>
+          <div class="field">
+            <label for="role">You are a…</label>
+            <select id="role" name="role" aria-label="Creator type">
+              <option value="" selected>Select one</option>
+              <option>Artist</option>
+              <option>Musician</option>
+              <option>Filmmaker</option>
+              <option>Designer</option>
+              <option>Writer</option>
+              <option>Other</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="field">
+          <label for="email">Email</label>
+          <input id="email" name="email" type="email" placeholder="you@domain.com" autocomplete="email" required />
+        </div>
+
+        <div class="actions">
+          <button class="btn btn-primary" type="submit" id="submitBtn">
+            Join Waitlist
+            <span aria-hidden="true">→</span>
+          </button>
+          <button class="btn btn-ghost" type="button" id="copyBtn" title="Copy your email">
+            Copy email
+          </button>
+        </div>
+
+        <p class="fineprint">
+          By joining, you agree to receive updates. No spam. Unsubscribe anytime.
+          <br />
+          <a href="#">Privacy</a>
+          ·
+          <a href="#">Terms</a>
+        </p>
+
+        <div class="status" id="statusBox" aria-live="polite"></div>
+      </form>
+    </div>
+
+    <div class="rule"></div>
+  </section>
+
+  <aside class="right" aria-label="Artwork panel">
+    <img src="{{ url_for('static', filename='images/Gowy-icaro-prado.jpg') }}" alt="The Fall of Icarus" class="painting" />
+    <div class="overlay"></div>
+    <p class="caption">Jacob Peter Gowy<br><em>The Fall of Icarus</em>, c. 1636</p>
+  </aside>
+</main>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+  const WAITLIST_ENDPOINT = "/waitlist/submit";
+
+  const form = document.getElementById('waitlistForm');
+  const submitBtn = document.getElementById('submitBtn');
+  const copyBtn = document.getElementById('copyBtn');
+  const statusBox = document.getElementById('statusBox');
+
+  function showStatus(title, message) {
+    statusBox.style.display = 'block';
+    statusBox.innerHTML = `<strong>${title}</strong><p>${message}</p>`;
+  }
+
+  function isValidEmail(email) {
+    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+  }
+
+  copyBtn.addEventListener('click', async () => {
+    const email = (document.getElementById('email').value || '').trim();
+    if (!email) {
+      showStatus('Add your email', 'Type an email first, then copy it.');
+      return;
+    }
+    try {
+      await navigator.clipboard.writeText(email);
+      showStatus('Copied', 'Your email is on the clipboard.');
+    } catch (e) {
+      showStatus('Couldn\'t copy', 'Your browser blocked clipboard access.');
+    }
+  });
+
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+
+    const name = (document.getElementById('name').value || '').trim();
+    const role = (document.getElementById('role').value || '').trim();
+    const email = (document.getElementById('email').value || '').trim().toLowerCase();
+
+    if (!isValidEmail(email)) {
+      showStatus('Check your email', 'That doesn\'t look like a valid email address.');
+      return;
+    }
+
+    submitBtn.disabled = true;
+    submitBtn.style.opacity = '0.85';
+    submitBtn.textContent = 'Joining…';
+
+    try {
+      const payload = { name, role, email, source: 'waitlist-page', ts: new Date().toISOString() };
+
+      const res = await fetch(WAITLIST_ENDPOINT, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      });
+
+      const data = await res.json();
+
+      if (data.success) {
+        showStatus('You\'re in.', 'We\'ll reach out when access opens. Keep making real work.');
+        form.reset();
+      } else {
+        showStatus('Something went wrong', data.error || 'Try again in a moment.');
+      }
+    } catch (err) {
+      showStatus('Something went wrong', 'Try again in a moment.');
+    } finally {
+      submitBtn.disabled = false;
+      submitBtn.style.opacity = '1';
+      submitBtn.innerHTML = 'Join Waitlist <span aria-hidden="true">→</span>';
+    }
+  });
+</script>
+{% endblock %}

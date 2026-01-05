@@ -1,0 +1,19 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(dir:*)",
+      "Bash(tree:*)",
+      "Bash(python update_templates.py:*)",
+      "Bash(python add_user_menu.py:*)",
+      "Bash(python load_demo_posts.py:*)",
+      "Bash(..venvScriptspython.exe load_demo_posts.py)",
+      "Bash(if [ -d \".venv\" ])",
+      "Bash(then .venv/Scripts/python load_demo_posts.py)",
+      "Bash(else python load_demo_posts.py)",
+      "Bash(fi)",
+      "Bash(.venv/Scripts/python:*)",
+      "Bash(python update_posts_display.py:*)",
+      "Bash(python update_explore_layout.py:*)"
+    ]
+  }
+}

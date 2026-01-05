@@ -1,0 +1,554 @@
+{% extends "base.html" %}
+
+{% block title %}Sign In — Icarus{% endblock %}
+
+{% block extra_css %}
+<style>
+    /* Layout */
+    .page {
+      min-height: 100vh;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+    }
+
+    /* Left Panel - Visual */
+    .visual-panel {
+      position: relative;
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .visual-bg {
+      position: absolute;
+      inset: 0;
+      background: 
+        radial-gradient(ellipse at 30% 20%, rgba(201, 184, 150, 0.15) 0%, transparent 50%),
+        radial-gradient(ellipse at 70% 80%, rgba(196, 129, 106, 0.1) 0%, transparent 50%),
+        linear-gradient(135deg, var(--forest-mid) 0%, var(--forest) 100%);
+    }
+
+    .visual-content {
+      position: relative;
+      z-index: 2;
+      text-align: center;
+      padding: 4rem;
+      opacity: 0;
+      animation: fadeUp 1s ease 0.2s forwards;
+    }
+
+    .greek-symbol {
+      font-family: 'Cormorant', serif;
+      font-size: 8rem;
+      font-style: italic;
+      color: var(--gold);
+      opacity: 0.3;
+      line-height: 1;
+      margin-bottom: 2rem;
+    }
+
+    .visual-title {
+      font-family: 'Cormorant', serif;
+      font-size: 2.5rem;
+      font-weight: 300;
+      color: var(--cream);
+      margin-bottom: 1rem;
+      letter-spacing: -0.02em;
+    }
+
+    .visual-title em {
+      font-style: italic;
+      color: var(--terracotta);
+    }
+
+    .visual-text {
+      font-size: 1rem;
+      color: var(--cream-muted);
+      max-width: 320px;
+      margin: 0 auto;
+    }
+
+    /* Right Panel - Form */
+    .form-panel {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      padding: 4rem;
+      position: relative;
+      background: var(--forest);
+    }
+
+    .form-panel::before {
+      content: '';
+      position: absolute;
+      left: 0;
+      top: 10%;
+      bottom: 10%;
+      width: 1px;
+      background: linear-gradient(to bottom, transparent, var(--gold-muted), transparent);
+    }
+
+    /* Logo */
+    .logo {
+      position: absolute;
+      top: 2rem;
+      left: 2rem;
+      font-family: 'Cormorant', serif;
+      font-size: 1.25rem;
+      color: var(--cream);
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      text-decoration: none;
+      opacity: 0;
+      animation: fadeUp 0.8s ease 0.1s forwards;
+    }
+
+    .logo-mark {
+      width: 32px;
+      height: 32px;
+      border: 1px solid var(--cream-faint);
+      border-radius: 4px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-style: italic;
+    }
+
+    /* Form Container */
+    .form-container {
+      width: 100%;
+      max-width: 400px;
+      opacity: 0;
+      animation: fadeUp 1s ease 0.4s forwards;
+    }
+
+    .form-header {
+      text-align: center;
+      margin-bottom: 2.5rem;
+    }
+
+    .form-label {
+      font-family: 'Cormorant', serif;
+      font-size: 0.875rem;
+      font-style: italic;
+      color: var(--gold);
+      margin-bottom: 0.75rem;
+      letter-spacing: 0.05em;
+    }
+
+    .form-title {
+      font-family: 'Cormorant', serif;
+      font-size: 2.75rem;
+      font-weight: 300;
+      letter-spacing: -0.02em;
+    }
+
+    .form-title em {
+      font-style: italic;
+      color: var(--terracotta);
+    }
+
+    /* Form */
+    .auth-form {
+      display: flex;
+      flex-direction: column;
+      gap: 1.25rem;
+    }
+
+    .field {
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+
+    .field label {
+      font-size: 0.875rem;
+      color: var(--cream-muted);
+      padding-left: 0.25rem;
+    }
+
+    .input-wrapper {
+      position: relative;
+    }
+
+    .input-wrapper input {
+      width: 100%;
+      padding: 1rem 1.25rem;
+      padding-right: 3rem;
+      border: 1px solid var(--cream-faint);
+      border-radius: 100px;
+      background: transparent;
+      color: var(--cream);
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.9375rem;
+      transition: border-color 0.2s ease, background 0.2s ease;
+    }
+
+    .input-wrapper input::placeholder {
+      color: var(--cream-faint);
+    }
+
+    .input-wrapper input:focus {
+      outline: none;
+      border-color: var(--gold-muted);
+      background: rgba(245, 242, 235, 0.03);
+    }
+
+    .input-wrapper svg {
+      position: absolute;
+      right: 1.25rem;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 20px;
+      height: 20px;
+      color: var(--cream-faint);
+      pointer-events: none;
+    }
+
+    .password-toggle {
+      position: absolute;
+      right: 3rem;
+      top: 50%;
+      transform: translateY(-50%);
+      background: none;
+      border: none;
+      color: var(--cream-faint);
+      cursor: pointer;
+      padding: 0.25rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: color 0.2s ease;
+    }
+
+    .password-toggle:hover {
+      color: var(--cream);
+    }
+
+    /* Form Options */
+    .form-options {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 0.25rem;
+    }
+
+    .checkbox-wrapper {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      cursor: pointer;
+      font-size: 0.875rem;
+      color: var(--cream-muted);
+    }
+
+    .checkbox-wrapper input[type="checkbox"] {
+      width: 18px;
+      height: 18px;
+      accent-color: var(--terracotta);
+      cursor: pointer;
+    }
+
+    .forgot-link {
+      font-size: 0.875rem;
+      color: var(--terracotta-light);
+      text-decoration: none;
+      transition: color 0.2s ease;
+    }
+
+    .forgot-link:hover {
+      color: var(--terracotta);
+    }
+
+    /* Submit Button */
+    .btn-submit {
+      width: 100%;
+      padding: 1rem 1.5rem;
+      margin-top: 0.75rem;
+      background: var(--terracotta);
+      color: var(--cream);
+      border: none;
+      border-radius: 100px;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 1rem;
+      font-weight: 500;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.75rem;
+      transition: all 0.3s ease;
+    }
+
+    .btn-submit:hover {
+      background: var(--terracotta-dark);
+      transform: translateY(-2px);
+      box-shadow: 0 15px 40px rgba(196, 129, 106, 0.25);
+    }
+
+    .btn-submit svg {
+      width: 20px;
+      height: 20px;
+      transition: transform 0.2s ease;
+    }
+
+    .btn-submit:hover svg {
+      transform: translateX(4px);
+    }
+
+    /* Divider */
+    .divider {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      margin: 1.5rem 0;
+    }
+
+    .divider-line {
+      flex: 1;
+      height: 1px;
+      background: var(--cream-faint);
+    }
+
+    .divider-text {
+      font-family: 'Cormorant', serif;
+      font-style: italic;
+      font-size: 0.875rem;
+      color: var(--cream-faint);
+    }
+
+    /* Social Login */
+    .social-buttons {
+      display: flex;
+      gap: 0.75rem;
+    }
+
+    .btn-social {
+      flex: 1;
+      padding: 0.875rem 1rem;
+      background: transparent;
+      border: 1px solid var(--cream-faint);
+      border-radius: 100px;
+      color: var(--cream);
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.875rem;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      transition: all 0.25s ease;
+    }
+
+    .btn-social:hover {
+      background: rgba(245, 242, 235, 0.05);
+      border-color: var(--cream-muted);
+    }
+
+    .btn-social svg {
+      width: 18px;
+      height: 18px;
+    }
+
+    /* Sign Up Link */
+    .signup-prompt {
+      text-align: center;
+      margin-top: 2.5rem;
+      font-size: 0.9375rem;
+      color: var(--cream-muted);
+    }
+
+    .signup-prompt a {
+      color: var(--terracotta-light);
+      text-decoration: none;
+      font-weight: 500;
+      margin-left: 0.25rem;
+      transition: color 0.2s ease;
+    }
+
+    .signup-prompt a:hover {
+      color: var(--terracotta);
+    }
+
+    /* Animations */
+    @keyframes fadeUp {
+      from {
+        opacity: 0;
+        transform: translateY(30px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    /* Responsive */
+    @media (max-width: 1024px) {
+      .page {
+        grid-template-columns: 1fr;
+      }
+
+      .visual-panel {
+        display: none;
+      }
+
+      .form-panel {
+        min-height: 100vh;
+        padding: 6rem 2rem 4rem;
+      }
+
+      .form-panel::before {
+        display: none;
+      }
+
+      .logo {
+        position: fixed;
+        top: 1.5rem;
+        left: 1.5rem;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .form-container {
+        max-width: 100%;
+      }
+
+      .form-title {
+        font-size: 2.25rem;
+      }
+
+      .social-buttons {
+        flex-direction: column;
+      }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="page">
+  <!-- Left Visual Panel -->
+  <div class="visual-panel">
+    <div class="visual-bg"></div>
+    <div class="visual-content">
+      <div class="greek-symbol">ι</div>
+      <h2 class="visual-title">Welcome back, <em>creator</em></h2>
+      <p class="visual-text">Continue your journey in the sanctuary of human creativity.</p>
+    </div>
+  </div>
+
+  <!-- Right Form Panel -->
+  <div class="form-panel">
+    <a href="{{ url_for('index') }}" class="logo">
+      <div class="logo-mark">ι</div>
+      icarus
+    </a>
+
+    <div class="form-container">
+      <div class="form-header">
+        <p class="form-label">Human-verified creators only</p>
+        <h1 class="form-title">Sign <em>in</em></h1>
+      </div>
+
+      <form class="auth-form" id="signinForm" action="{{ url_for('signin') }}" method="POST">
+        <div class="field">
+          <label for="email">Email</label>
+          <div class="input-wrapper">
+            <input type="email" id="email" name="email" placeholder="you@domain.com" required>
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M21.75 6.75v10.5a2.25 2.25 0 01-2.25 2.25h-15a2.25 2.25 0 01-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0019.5 4.5h-15a2.25 2.25 0 00-2.25 2.25m19.5 0v.243a2.25 2.25 0 01-1.07 1.916l-7.5 4.615a2.25 2.25 0 01-2.36 0L3.32 8.91a2.25 2.25 0 01-1.07-1.916V6.75" />
+            </svg>
+          </div>
+        </div>
+
+        <div class="field">
+          <label for="password">Password</label>
+          <div class="input-wrapper">
+            <input type="password" id="password" name="password" placeholder="••••••••" required>
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M16.5 10.5V6.75a4.5 4.5 0 10-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 002.25-2.25v-6.75a2.25 2.25 0 00-2.25-2.25H6.75a2.25 2.25 0 00-2.25 2.25v6.75a2.25 2.25 0 002.25 2.25z" />
+            </svg>
+            <button type="button" class="password-toggle" onclick="togglePassword()">
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5" width="18" height="18">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178z" />
+                <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+              </svg>
+            </button>
+          </div>
+        </div>
+
+        <div class="form-options">
+          <label class="checkbox-wrapper">
+            <input type="checkbox" name="remember">
+            <span>Remember me</span>
+          </label>
+          <a href="#" class="forgot-link">Forgot password?</a>
+        </div>
+
+        <button type="submit" class="btn-submit">
+          Sign In
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3" />
+          </svg>
+        </button>
+
+        <div class="divider">
+          <div class="divider-line"></div>
+          <span class="divider-text">or continue with</span>
+          <div class="divider-line"></div>
+        </div>
+
+        <div class="social-buttons">
+          <button type="button" class="btn-social">
+            <svg viewBox="0 0 24 24" fill="currentColor">
+              <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+              <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+              <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
+              <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
+            </svg>
+            Google
+          </button>
+          <button type="button" class="btn-social">
+            <svg viewBox="0 0 24 24" fill="currentColor">
+              <path d="M12 2C6.477 2 2 6.477 2 12c0 4.42 2.865 8.166 6.839 9.489.5.092.682-.217.682-.482 0-.237-.008-.866-.013-1.7-2.782.604-3.369-1.341-3.369-1.341-.454-1.155-1.11-1.462-1.11-1.462-.908-.62.069-.608.069-.608 1.003.07 1.531 1.03 1.531 1.03.892 1.529 2.341 1.087 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.11-4.555-4.943 0-1.091.39-1.984 1.029-2.683-.103-.253-.446-1.27.098-2.647 0 0 .84-.269 2.75 1.025A9.578 9.578 0 0112 6.836c.85.004 1.705.114 2.504.336 1.909-1.294 2.747-1.025 2.747-1.025.546 1.377.203 2.394.1 2.647.64.699 1.028 1.592 1.028 2.683 0 3.842-2.339 4.687-4.566 4.935.359.309.678.919.678 1.852 0 1.336-.012 2.415-.012 2.743 0 .267.18.578.688.48C19.138 20.163 22 16.418 22 12c0-5.523-4.477-10-10-10z"/>
+            </svg>
+            GitHub
+          </button>
+        </div>
+      </form>
+
+      <p class="signup-prompt">
+        New to Icarus?<a href="{{ url_for('signup') }}">Create an account</a>
+      </p>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+  function togglePassword() {
+    const passwordInput = document.getElementById('password');
+    const toggle = document.querySelector('.password-toggle');
+    
+    if (passwordInput.type === 'password') {
+      passwordInput.type = 'text';
+      toggle.innerHTML = `
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5" width="18" height="18">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M3.98 8.223A10.477 10.477 0 001.934 12C3.226 16.338 7.244 19.5 12 19.5c.993 0 1.953-.138 2.863-.395M6.228 6.228A10.45 10.45 0 0112 4.5c4.756 0 8.773 3.162 10.065 7.498a10.523 10.523 0 01-4.293 5.774M6.228 6.228L3 3m3.228 3.228l3.65 3.65m7.894 7.894L21 21m-3.228-3.228l-3.65-3.65m0 0a3 3 0 10-4.243-4.243m4.242 4.242L9.88 9.88" />
+        </svg>
+      `;
+    } else {
+      passwordInput.type = 'password';
+      toggle.innerHTML = `
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5" width="18" height="18">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178z" />
+          <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+        </svg>
+      `;
+    }
+  }
+</script>
+{% endblock %}

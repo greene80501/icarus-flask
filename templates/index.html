@@ -1,0 +1,825 @@
+{% extends "base.html" %}
+
+{% block title %}Icarus — Real Creativity. Real People.{% endblock %}
+
+{% block extra_css %}
+<style>
+    /* Navigation */
+    nav {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 100;
+      padding: 1.5rem 4rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      mix-blend-mode: difference;
+    }
+
+    .logo {
+      font-family: 'Cormorant', serif;
+      font-size: 1.5rem;
+      font-weight: 400;
+      color: var(--cream);
+      letter-spacing: -0.01em;
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      text-decoration: none;
+    }
+
+    .logo-mark {
+      width: 36px;
+      height: 36px;
+      border: 1px solid currentColor;
+      border-radius: 4px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.125rem;
+      font-style: italic;
+    }
+
+    .nav-right {
+      display: flex;
+      align-items: center;
+      gap: 3rem;
+    }
+
+    .nav-links {
+      display: flex;
+      gap: 2.5rem;
+    }
+
+    .nav-links a {
+      color: var(--cream);
+      text-decoration: none;
+      font-size: 0.9375rem;
+      opacity: 0.7;
+      transition: opacity 0.2s ease;
+    }
+
+    .nav-links a:hover {
+      opacity: 1;
+    }
+
+    .nav-cta {
+      padding: 0.75rem 1.75rem;
+      background: var(--cream);
+      color: var(--forest);
+      border: none;
+      border-radius: 100px;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.875rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+      mix-blend-mode: normal;
+      text-decoration: none;
+    }
+
+    .nav-cta:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+    }
+
+    /* Hero */
+    .hero {
+      min-height: 100vh;
+      display: grid;
+      grid-template-columns: 1fr 1.1fr;
+      position: relative;
+    }
+
+    .hero-content {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      padding: 8rem 4rem 4rem 8rem;
+      position: relative;
+      z-index: 2;
+    }
+
+    .hero-label {
+      font-family: 'Cormorant', serif;
+      font-size: 0.9375rem;
+      font-style: italic;
+      color: var(--gold);
+      margin-bottom: 2rem;
+      letter-spacing: 0.03em;
+      opacity: 0;
+      animation: fadeUp 1s ease 0.2s forwards;
+    }
+
+    .hero-title {
+      font-family: 'Cormorant', serif;
+      font-size: clamp(3.5rem, 6vw, 5.5rem);
+      font-weight: 300;
+      line-height: 1.05;
+      margin-bottom: 2rem;
+      letter-spacing: -0.02em;
+      opacity: 0;
+      animation: fadeUp 1s ease 0.4s forwards;
+    }
+
+    .hero-title em {
+      font-style: italic;
+      font-weight: 400;
+      color: var(--terracotta);
+    }
+
+    .hero-text {
+      font-size: 1.125rem;
+      color: var(--cream-muted);
+      margin-bottom: 3rem;
+      max-width: 420px;
+      line-height: 1.8;
+      opacity: 0;
+      animation: fadeUp 1s ease 0.6s forwards;
+    }
+
+    .hero-visual {
+      position: relative;
+      overflow: hidden;
+    }
+
+    .hero-painting {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      opacity: 0;
+      transform: scale(1.05);
+      animation: paintingReveal 1.5s ease 0.3s forwards;
+    }
+
+    .hero-painting-overlay {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(to right, var(--forest) 0%, transparent 30%),
+                  linear-gradient(to top, var(--forest) 0%, transparent 20%);
+      pointer-events: none;
+    }
+
+    .hero-caption {
+      position: absolute;
+      bottom: 3rem;
+      right: 3rem;
+      font-family: 'Cormorant', serif;
+      font-size: 0.875rem;
+      font-style: italic;
+      color: var(--cream);
+      opacity: 0.6;
+      text-align: right;
+      line-height: 1.5;
+    }
+
+    @keyframes fadeUp {
+      from {
+        opacity: 0;
+        transform: translateY(30px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    @keyframes paintingReveal {
+      from {
+        opacity: 0;
+        transform: scale(1.1);
+      }
+      to {
+        opacity: 1;
+        transform: scale(1);
+      }
+    }
+
+    /* Scroll hint */
+    .scroll-hint {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      font-size: 0.8125rem;
+      color: var(--cream-faint);
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      opacity: 0;
+      animation: fadeUp 1s ease 1.2s forwards;
+      margin-top: 4rem;
+    }
+
+    .scroll-line {
+      width: 60px;
+      height: 1px;
+      background: var(--cream-faint);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .scroll-line::after {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: var(--cream);
+      animation: scrollLine 2s ease-in-out infinite;
+    }
+
+    @keyframes scrollLine {
+      0% { left: -100%; }
+      50% { left: 100%; }
+      100% { left: 100%; }
+    }
+
+    /* Statement Section */
+    .statement {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 8rem 4rem;
+      background: var(--cream);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .statement::before {
+      content: '';
+      position: absolute;
+      top: 10%;
+      left: 5%;
+      width: 300px;
+      height: 300px;
+      border: 1px solid var(--gold-muted);
+      border-radius: 50%;
+      opacity: 0.3;
+    }
+
+    .statement-inner {
+      max-width: 900px;
+      text-align: center;
+    }
+
+    .statement-text {
+      font-family: 'Cormorant', serif;
+      font-size: clamp(2rem, 4vw, 3rem);
+      font-weight: 300;
+      line-height: 1.4;
+      color: var(--forest);
+      letter-spacing: -0.01em;
+    }
+
+    .statement-text em {
+      font-style: italic;
+    }
+
+    .statement-text .highlight {
+      color: var(--terracotta);
+      font-weight: 400;
+    }
+
+    /* Triptych */
+    .triptych {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      min-height: 70vh;
+    }
+
+    .triptych-panel {
+      padding: 6rem 3rem;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      border-right: 1px solid var(--gold-muted);
+      position: relative;
+    }
+
+    .triptych-panel:last-child {
+      border-right: none;
+    }
+
+    .triptych-number {
+      font-family: 'Cormorant', serif;
+      font-size: 6rem;
+      font-weight: 300;
+      color: var(--gold);
+      opacity: 0.3;
+      position: absolute;
+      top: 2rem;
+      left: 2rem;
+    }
+
+    .triptych-content {
+      position: relative;
+      z-index: 2;
+    }
+
+    .triptych-word {
+      font-family: 'Cormorant', serif;
+      font-size: 2.25rem;
+      font-weight: 400;
+      font-style: italic;
+      color: var(--terracotta);
+      margin-bottom: 1rem;
+    }
+
+    .triptych-text {
+      color: var(--cream-muted);
+      font-size: 1rem;
+      line-height: 1.8;
+      max-width: 280px;
+    }
+
+    /* Manifesto */
+    .manifesto {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 10rem 4rem;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .manifesto-bg {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      opacity: 0.15;
+      filter: grayscale(100%);
+    }
+
+    .manifesto-inner {
+      max-width: 800px;
+      text-align: center;
+      position: relative;
+      z-index: 2;
+    }
+
+    .manifesto-mark {
+      font-family: 'Cormorant', serif;
+      font-size: 8rem;
+      color: var(--gold);
+      opacity: 0.4;
+      line-height: 0.5;
+      margin-bottom: 2rem;
+    }
+
+    .manifesto-text {
+      font-family: 'Cormorant', serif;
+      font-size: clamp(1.5rem, 3vw, 2rem);
+      font-weight: 300;
+      line-height: 1.7;
+      color: var(--cream);
+      letter-spacing: -0.01em;
+    }
+
+    .manifesto-text em {
+      font-style: italic;
+      color: var(--terracotta);
+    }
+
+    .manifesto-footer {
+      margin-top: 3rem;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    .manifesto-line {
+      width: 60px;
+      height: 1px;
+      background: var(--gold-muted);
+    }
+
+    .manifesto-author {
+      font-family: 'Cormorant', serif;
+      font-style: italic;
+      color: var(--gold);
+      font-size: 1rem;
+    }
+
+    /* Visual Break */
+    .visual-break {
+      height: 60vh;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .visual-break img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .visual-break-overlay {
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(to bottom, var(--forest), transparent 30%, transparent 70%, var(--forest));
+    }
+
+    .visual-break-text {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      font-family: 'Cormorant', serif;
+      font-size: clamp(1.5rem, 3vw, 2.5rem);
+      font-style: italic;
+      color: var(--cream);
+      text-align: center;
+      letter-spacing: 0.1em;
+    }
+
+    /* CTA */
+    .cta {
+      min-height: 80vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 8rem 4rem;
+      text-align: center;
+    }
+
+    .cta-inner {
+      max-width: 600px;
+    }
+
+    .cta-label {
+      font-family: 'Cormorant', serif;
+      font-size: 0.9375rem;
+      font-style: italic;
+      color: var(--gold);
+      margin-bottom: 1.5rem;
+      letter-spacing: 0.05em;
+    }
+
+    .cta-title {
+      font-family: 'Cormorant', serif;
+      font-size: clamp(3rem, 5vw, 4.5rem);
+      font-weight: 300;
+      line-height: 1.1;
+      margin-bottom: 1.5rem;
+      letter-spacing: -0.02em;
+    }
+
+    .cta-title em {
+      font-style: italic;
+      color: var(--terracotta);
+    }
+
+    .cta-text {
+      color: var(--cream-muted);
+      font-size: 1.125rem;
+      margin-bottom: 3rem;
+      line-height: 1.8;
+    }
+
+    .cta-btn {
+      display: inline-block;
+      padding: 1.25rem 3rem;
+      background: var(--terracotta);
+      color: var(--cream);
+      border: none;
+      border-radius: 100px;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 1rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      text-decoration: none;
+    }
+
+    .cta-btn:hover {
+      background: var(--terracotta-dark);
+      transform: translateY(-3px);
+      box-shadow: 0 20px 50px rgba(196, 129, 106, 0.3);
+    }
+
+    /* Footer */
+    footer {
+      padding: 4rem;
+      border-top: 1px solid var(--gold-muted);
+    }
+
+    .footer-inner {
+      max-width: 1200px;
+      margin: 0 auto;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .footer-logo {
+      font-family: 'Cormorant', serif;
+      font-size: 1.25rem;
+      font-weight: 400;
+      color: var(--cream);
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      text-decoration: none;
+    }
+
+    .footer-logo .logo-mark {
+      width: 32px;
+      height: 32px;
+      font-size: 1rem;
+    }
+
+    .footer-links {
+      display: flex;
+      gap: 2.5rem;
+    }
+
+    .footer-links a {
+      color: var(--cream-muted);
+      text-decoration: none;
+      font-size: 0.875rem;
+      transition: color 0.2s ease;
+    }
+
+    .footer-links a:hover {
+      color: var(--cream);
+    }
+
+    .footer-note {
+      font-family: 'Cormorant', serif;
+      font-style: italic;
+      font-size: 0.875rem;
+      color: var(--gold);
+    }
+
+    /* Scroll Animations */
+    .fade-in {
+      opacity: 0;
+      transform: translateY(40px);
+      transition: opacity 0.8s ease, transform 0.8s ease;
+    }
+
+    .fade-in.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    /* Responsive */
+    @media (max-width: 1024px) {
+      nav {
+        padding: 1.5rem 2rem;
+      }
+
+      .hero {
+        grid-template-columns: 1fr;
+      }
+
+      .hero-content {
+        padding: 10rem 2rem 4rem;
+        text-align: center;
+        align-items: center;
+      }
+
+      .hero-text {
+        margin-left: auto;
+        margin-right: auto;
+      }
+
+      .hero-visual {
+        height: 50vh;
+        min-height: 400px;
+      }
+
+      .hero-caption {
+        bottom: 2rem;
+        right: 2rem;
+      }
+
+      .scroll-hint {
+        margin-top: 3rem;
+        justify-content: center;
+      }
+
+      .statement {
+        padding: 6rem 2rem;
+      }
+
+      .triptych {
+        grid-template-columns: 1fr;
+        min-height: auto;
+      }
+
+      .triptych-panel {
+        border-right: none;
+        border-bottom: 1px solid var(--gold-muted);
+        padding: 5rem 2rem;
+        min-height: 50vh;
+      }
+
+      .triptych-panel:last-child {
+        border-bottom: none;
+      }
+
+      .triptych-number {
+        font-size: 5rem;
+      }
+
+      .manifesto {
+        padding: 8rem 2rem;
+      }
+
+      .cta {
+        padding: 8rem 2rem;
+      }
+
+      .footer-inner {
+        flex-direction: column;
+        gap: 2rem;
+        text-align: center;
+      }
+
+      .footer-links {
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 1.5rem;
+      }
+    }
+
+    @media (max-width: 600px) {
+      .nav-links {
+        display: none;
+      }
+
+      .hero-title {
+        font-size: 2.75rem;
+      }
+
+      .statement-text {
+        font-size: 1.75rem;
+      }
+
+      .triptych-word {
+        font-size: 1.75rem;
+      }
+
+      .manifesto-mark {
+        font-size: 6rem;
+      }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+  <!-- Navigation -->
+  <nav>
+    <a href="{{ url_for('index') }}" class="logo">
+      <div class="logo-mark">ι</div>
+      icarus
+    </a>
+    <div class="nav-right">
+      <div class="nav-links">
+        <a href="#manifesto">Manifesto</a>
+        {% if current_user.is_authenticated %}
+        <a href="{{ url_for('dashboard') }}">Dashboard</a>
+        {% else %}
+        <a href="{{ url_for('signin') }}">Sign In</a>
+        {% endif %}
+      </div>
+      <a href="{{ url_for('waitlist') }}" class="nav-cta">Join Waitlist</a>
+    </div>
+  </nav>
+
+  <!-- Hero -->
+  <section class="hero">
+    <div class="hero-content">
+      <p class="hero-label">A sanctuary for human creativity</p>
+      <h1 class="hero-title">A place for <em>real creativity</em></h1>
+      <p class="hero-text">We're building a social platform where every piece of art, music, and video is made by human hands. A space where your work isn't drowned out by machines.</p>
+      <div class="scroll-hint">
+        <span>Scroll</span>
+        <div class="scroll-line"></div>
+      </div>
+    </div>
+    <div class="hero-visual">
+      <img src="{{ url_for('static', filename='images/Gowy-icaro-prado.jpg') }}" alt="The Fall of Icarus" class="hero-painting">
+      <div class="hero-painting-overlay"></div>
+      <p class="hero-caption">Jacob Peter Gowy<br><em>The Fall of Icarus</em>, c. 1636</p>
+    </div>
+  </section>
+
+  <!-- Statement -->
+  <section class="statement">
+    <div class="statement-inner fade-in">
+      <p class="statement-text">
+        In a world filling with synthetic content,<br>
+        we're building a space where <em>every</em> creation<br>
+        is <span class="highlight">verified human</span>.
+      </p>
+    </div>
+  </section>
+
+  <!-- Triptych -->
+  <section class="triptych">
+    <div class="triptych-panel fade-in">
+      <div class="triptych-number">I</div>
+      <div class="triptych-content">
+        <h3 class="triptych-word">Art</h3>
+        <p class="triptych-text">Paintings, illustrations, photography, digital art—work that took time to conceive and create.</p>
+      </div>
+    </div>
+    <div class="triptych-panel fade-in">
+      <div class="triptych-number">II</div>
+      <div class="triptych-content">
+        <h3 class="triptych-word">Music</h3>
+        <p class="triptych-text">Compositions, performances, productions—sound that came from a human heart.</p>
+      </div>
+    </div>
+    <div class="triptych-panel fade-in">
+      <div class="triptych-number">III</div>
+      <div class="triptych-content">
+        <h3 class="triptych-word">Film</h3>
+        <p class="triptych-text">Videos, animations, documentaries—stories told by human hands.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Manifesto -->
+  <section class="manifesto" id="manifesto">
+    <img src="{{ url_for('static', filename='images/37571d8f64ef1878e7e6439204eca3a7.jpg') }}" alt="" class="manifesto-bg" aria-hidden="true">
+    <div class="manifesto-inner fade-in">
+      <div class="manifesto-mark">"</div>
+      <p class="manifesto-text">
+        Like Icarus, we believe in the audacity of human ambition—the sweat, the struggle, the <em>soul</em> that goes into making something real. We're building a refuge for people who still believe art should cost something to create.
+      </p>
+      <div class="manifesto-footer">
+        <div class="manifesto-line"></div>
+        <p class="manifesto-author">The Icarus Team</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Visual Break -->
+  <section class="visual-break">
+    <img src="{{ url_for('static', filename='images/Gowy-icaro-prado.jpg') }}" alt="Icarus falling">
+    <div class="visual-break-overlay"></div>
+    <p class="visual-break-text">For those who dare to create</p>
+  </section>
+
+  <!-- CTA -->
+  <section class="cta">
+    <div class="cta-inner fade-in">
+      <p class="cta-label">Be among the first</p>
+      <h2 class="cta-title">Ready to <em>join us</em>?</h2>
+      <p class="cta-text">We're opening access slowly to make sure we get this right.</p>
+      <a href="{{ url_for('waitlist') }}" class="cta-btn">Join the Waitlist</a>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer>
+    <div class="footer-inner">
+      <a href="{{ url_for('index') }}" class="footer-logo">
+        <div class="logo-mark">ι</div>
+        icarus
+      </a>
+      <div class="footer-links">
+        <a href="#manifesto">Manifesto</a>
+        <a href="#">Privacy</a>
+        <a href="#">Terms</a>
+      </div>
+      <p class="footer-note">Made by humans</p>
+    </div>
+  </footer>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+  // Scroll animations
+  const observerOptions = {
+    threshold: 0.15,
+    rootMargin: '0px 0px -50px 0px'
+  };
+
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        entry.target.classList.add('visible');
+      }
+    });
+  }, observerOptions);
+
+  document.querySelectorAll('.fade-in').forEach(el => observer.observe(el));
+</script>
+{% endblock %}

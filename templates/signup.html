@@ -1,0 +1,1022 @@
+{% extends "base.html" %}
+
+{% block title %}Create Account — Icarus{% endblock %}
+
+{% block extra_css %}
+<style>
+    /* Layout */
+    .page {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      position: relative;
+    }
+
+    /* Background Art */
+    .bg-pattern {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      overflow: hidden;
+    }
+
+    .bg-circle {
+      position: absolute;
+      border: 1px solid var(--gold-muted);
+      border-radius: 50%;
+      opacity: 0.15;
+    }
+
+    .bg-circle:nth-child(1) {
+      width: 600px;
+      height: 600px;
+      top: -200px;
+      right: -200px;
+    }
+
+    .bg-circle:nth-child(2) {
+      width: 400px;
+      height: 400px;
+      bottom: -100px;
+      left: -100px;
+    }
+
+    .bg-circle:nth-child(3) {
+      width: 200px;
+      height: 200px;
+      top: 50%;
+      left: 10%;
+      transform: translateY(-50%);
+    }
+
+    /* Header */
+    .header {
+      padding: 1.5rem 3rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      position: relative;
+      z-index: 10;
+    }
+
+    .logo {
+      font-family: 'Cormorant', serif;
+      font-size: 1.25rem;
+      color: var(--cream);
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      text-decoration: none;
+    }
+
+    .logo-mark {
+      width: 32px;
+      height: 32px;
+      border: 1px solid var(--cream-faint);
+      border-radius: 4px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-style: italic;
+    }
+
+    .signin-link {
+      font-size: 0.9375rem;
+      color: var(--cream-muted);
+    }
+
+    .signin-link a {
+      color: var(--terracotta-light);
+      text-decoration: none;
+      margin-left: 0.25rem;
+      transition: color 0.2s ease;
+    }
+
+    .signin-link a:hover {
+      color: var(--terracotta);
+    }
+
+    /* Main Content */
+    .main {
+      flex: 1;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 2rem;
+    }
+
+    /* Steps Container */
+    .steps-container {
+      width: 100%;
+      max-width: 560px;
+      position: relative;
+    }
+
+    /* Progress Indicator */
+    .progress {
+      display: flex;
+      justify-content: center;
+      gap: 1rem;
+      margin-bottom: 2.5rem;
+    }
+
+    .progress-step {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .progress-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: var(--cream-faint);
+      transition: all 0.4s ease;
+    }
+
+    .progress-dot.active {
+      background: var(--terracotta);
+      box-shadow: 0 0 12px rgba(196, 129, 106, 0.5);
+    }
+
+    .progress-dot.completed {
+      background: var(--gold);
+    }
+
+    .progress-line {
+      width: 60px;
+      height: 2px;
+      background: var(--cream-faint);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .progress-line::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: var(--gold);
+      transform: scaleX(0);
+      transform-origin: left;
+      transition: transform 0.6s ease;
+    }
+
+    .progress-line.filled::after {
+      transform: scaleX(1);
+    }
+
+    .progress-label {
+      font-family: 'Cormorant', serif;
+      font-size: 0.8125rem;
+      font-style: italic;
+      color: var(--cream-faint);
+      transition: color 0.3s ease;
+    }
+
+    .progress-step.active .progress-label {
+      color: var(--cream);
+    }
+
+    /* Step Panels */
+    .step-panel {
+      display: none;
+      animation: fadeIn 0.6s ease;
+    }
+
+    .step-panel.active {
+      display: block;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .step-header {
+      text-align: center;
+      margin-bottom: 2rem;
+    }
+
+    .step-label {
+      font-family: 'Cormorant', serif;
+      font-size: 0.875rem;
+      font-style: italic;
+      color: var(--gold);
+      margin-bottom: 0.75rem;
+      letter-spacing: 0.05em;
+    }
+
+    .step-title {
+      font-family: 'Cormorant', serif;
+      font-size: 2.75rem;
+      font-weight: 300;
+      letter-spacing: -0.02em;
+    }
+
+    .step-title em {
+      font-style: italic;
+      color: var(--terracotta);
+    }
+
+    .step-subtitle {
+      color: var(--cream-muted);
+      margin-top: 0.75rem;
+      font-size: 1rem;
+    }
+
+    /* Form Card */
+    .form-card {
+      background: rgba(245, 242, 235, 0.03);
+      border: 1px solid rgba(245, 242, 235, 0.08);
+      border-radius: 24px;
+      padding: 2.5rem;
+      backdrop-filter: blur(10px);
+    }
+
+    .field {
+      margin-bottom: 1.25rem;
+    }
+
+    .field label {
+      display: block;
+      font-size: 0.875rem;
+      color: var(--cream-muted);
+      margin-bottom: 0.5rem;
+      padding-left: 0.25rem;
+    }
+
+    .input-wrapper {
+      position: relative;
+    }
+
+    .input-wrapper input {
+      width: 100%;
+      padding: 1rem 1.25rem;
+      padding-right: 3rem;
+      border: 1px solid var(--cream-faint);
+      border-radius: 100px;
+      background: transparent;
+      color: var(--cream);
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.9375rem;
+      transition: border-color 0.2s ease, background 0.2s ease;
+    }
+
+    .input-wrapper input::placeholder {
+      color: var(--cream-faint);
+    }
+
+    .input-wrapper input:focus {
+      outline: none;
+      border-color: var(--gold-muted);
+      background: rgba(245, 242, 235, 0.03);
+    }
+
+    .input-wrapper svg {
+      position: absolute;
+      right: 1.25rem;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 20px;
+      height: 20px;
+      color: var(--cream-faint);
+      pointer-events: none;
+    }
+
+    /* Contact Toggle */
+    .contact-toggle {
+      display: flex;
+      gap: 0.5rem;
+      margin-bottom: 1rem;
+    }
+
+    .toggle-btn {
+      flex: 1;
+      padding: 0.75rem;
+      background: transparent;
+      border: 1px solid var(--cream-faint);
+      border-radius: 100px;
+      color: var(--cream-muted);
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.875rem;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .toggle-btn.active {
+      background: rgba(245, 242, 235, 0.08);
+      border-color: var(--cream-muted);
+      color: var(--cream);
+    }
+
+    .contact-field {
+      display: none;
+    }
+
+    .contact-field.active {
+      display: block;
+    }
+
+    /* Buttons */
+    .form-actions {
+      display: flex;
+      gap: 1rem;
+      margin-top: 1.5rem;
+    }
+
+    .btn {
+      padding: 1rem 2rem;
+      border-radius: 100px;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 1rem;
+      font-weight: 500;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      transition: all 0.3s ease;
+    }
+
+    .btn svg {
+      width: 20px;
+      height: 20px;
+    }
+
+    .btn-next {
+      flex: 1;
+      background: var(--terracotta);
+      color: var(--cream);
+      border: none;
+    }
+
+    .btn-next:hover {
+      background: var(--terracotta-dark);
+      transform: translateY(-2px);
+      box-shadow: 0 15px 40px rgba(196, 129, 106, 0.25);
+    }
+
+    .btn-next:disabled {
+      opacity: 0.7;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    .btn-back {
+      background: transparent;
+      color: var(--cream);
+      border: 1px solid var(--cream-faint);
+    }
+
+    .btn-back:hover {
+      background: rgba(245, 242, 235, 0.05);
+    }
+
+    .terms {
+      text-align: center;
+      font-size: 0.8125rem;
+      color: var(--cream-faint);
+      margin-top: 1.5rem;
+    }
+
+    .terms a {
+      color: var(--cream-muted);
+      text-decoration: none;
+      border-bottom: 1px solid transparent;
+    }
+
+    .terms a:hover {
+      border-bottom-color: var(--cream-muted);
+    }
+
+    /* Theme Selection */
+    .theme-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .theme-card {
+      position: relative;
+      border: 2px solid var(--cream-faint);
+      border-radius: 16px;
+      padding: 1rem;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      background: transparent;
+    }
+
+    .theme-card input {
+      position: absolute;
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    .theme-card.selected {
+      border-color: var(--terracotta);
+      background: rgba(196, 129, 106, 0.1);
+    }
+
+    .theme-preview {
+      height: 100px;
+      border-radius: 8px;
+      margin-bottom: 0.75rem;
+      overflow: hidden;
+      padding: 0.5rem;
+    }
+
+    /* Theme previews */
+    .theme-dark .theme-preview {
+      background: #0a0a0a;
+    }
+
+    .theme-light .theme-preview {
+      background: #faf9f6;
+    }
+
+    .theme-earth .theme-preview {
+      background: var(--forest);
+    }
+
+    .preview-header {
+      height: 12px;
+      background: currentColor;
+      opacity: 0.1;
+      border-radius: 2px;
+      margin-bottom: 0.5rem;
+    }
+
+    .preview-content {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .preview-line {
+      height: 6px;
+      background: currentColor;
+      opacity: 0.2;
+      border-radius: 2px;
+    }
+
+    .preview-line:nth-child(2) { width: 80%; }
+    .preview-line:nth-child(3) { width: 60%; }
+
+    .preview-accent {
+      height: 20px;
+      width: 50%;
+      margin-top: auto;
+      background: var(--terracotta);
+      border-radius: 4px;
+      opacity: 0.8;
+    }
+
+    .theme-dark .theme-preview { color: #f0f0f0; }
+    .theme-light .theme-preview { color: #2a2a2a; }
+    .theme-earth .theme-preview { color: var(--cream); }
+
+    .theme-label {
+      text-align: center;
+    }
+
+    .theme-name {
+      font-family: 'Cormorant', serif;
+      font-size: 1rem;
+      font-weight: 500;
+      margin-bottom: 0.125rem;
+    }
+
+    .theme-desc {
+      font-size: 0.75rem;
+      color: var(--cream-muted);
+    }
+
+    .theme-check {
+      position: absolute;
+      top: 0.75rem;
+      right: 0.75rem;
+      width: 24px;
+      height: 24px;
+      background: var(--terracotta);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      opacity: 0;
+      transform: scale(0.5);
+      transition: all 0.3s ease;
+    }
+
+    .theme-check svg {
+      width: 14px;
+      height: 14px;
+      color: var(--cream);
+    }
+
+    .theme-card.selected .theme-check {
+      opacity: 1;
+      transform: scale(1);
+    }
+
+    /* Success State */
+    .success-container {
+      display: none;
+      text-align: center;
+      padding: 3rem;
+      animation: fadeIn 0.8s ease;
+    }
+
+    .success-container.active {
+      display: block;
+    }
+
+    .success-icon {
+      width: 80px;
+      height: 80px;
+      background: var(--terracotta);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 2rem;
+      animation: scaleIn 0.5s ease;
+    }
+
+    @keyframes scaleIn {
+      from { transform: scale(0); }
+      to { transform: scale(1); }
+    }
+
+    .success-icon svg {
+      width: 40px;
+      height: 40px;
+      color: var(--cream);
+    }
+
+    .success-title {
+      font-family: 'Cormorant', serif;
+      font-size: 2.5rem;
+      font-weight: 300;
+      margin-bottom: 1rem;
+    }
+
+    .success-title em {
+      font-style: italic;
+      color: var(--terracotta);
+    }
+
+    .success-text {
+      color: var(--cream-muted);
+      font-size: 1.125rem;
+      margin-bottom: 2rem;
+      max-width: 400px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    .btn-start {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 1rem 2.5rem;
+      background: var(--terracotta);
+      color: var(--cream);
+      border: none;
+      border-radius: 100px;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 1rem;
+      font-weight: 500;
+      text-decoration: none;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    .btn-start:hover {
+      background: var(--terracotta-dark);
+      transform: translateY(-2px);
+      box-shadow: 0 15px 40px rgba(196, 129, 106, 0.25);
+    }
+
+    /* Error messages */
+    .error-message {
+      color: var(--error);
+      font-size: 0.875rem;
+      margin-top: 0.5rem;
+      padding-left: 0.25rem;
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+      .header {
+        padding: 1rem 1.5rem;
+      }
+
+      .main {
+        padding: 1rem;
+      }
+
+      .form-card {
+        padding: 1.5rem;
+      }
+
+      .step-title {
+        font-size: 2rem;
+      }
+
+      .theme-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .theme-card {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+      }
+
+      .theme-preview {
+        width: 80px;
+        height: 60px;
+        margin-bottom: 0;
+      }
+
+      .theme-label {
+        text-align: left;
+        flex: 1;
+      }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="page">
+  <!-- Background Art -->
+  <div class="bg-pattern">
+    <div class="bg-circle"></div>
+    <div class="bg-circle"></div>
+    <div class="bg-circle"></div>
+  </div>
+
+  <!-- Header -->
+  <header class="header">
+    <a href="{{ url_for('index') }}" class="logo">
+      <div class="logo-mark">ι</div>
+      icarus
+    </a>
+    <p class="signin-link">Already have an account?<a href="{{ url_for('signin') }}">Sign in</a></p>
+  </header>
+
+  <!-- Main Content -->
+  <main class="main">
+    <div class="steps-container">
+      <!-- Progress -->
+      <div class="progress">
+        <div class="progress-step active" data-step="1">
+          <div class="progress-dot active"></div>
+          <span class="progress-label">Details</span>
+        </div>
+        <div class="progress-line"></div>
+        <div class="progress-step" data-step="2">
+          <div class="progress-dot"></div>
+          <span class="progress-label">Theme</span>
+        </div>
+      </div>
+
+      <!-- Step 1: Details -->
+      <div class="step-panel active" data-panel="1">
+        <div class="step-header">
+          <p class="step-label">Step I of II</p>
+          <h1 class="step-title">Create your <em>account</em></h1>
+          <p class="step-subtitle">Join the sanctuary for human creativity</p>
+        </div>
+
+        <div class="form-card">
+          <form id="detailsForm">
+            <!-- Name -->
+            <div class="field">
+              <label for="name">Your name</label>
+              <div class="input-wrapper">
+                <input type="text" id="name" name="name" placeholder="What should we call you?">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z" />
+                </svg>
+              </div>
+            </div>
+
+            <!-- Email -->
+            <div class="field">
+              <label for="email">Email address</label>
+              <div class="input-wrapper">
+                <input type="email" id="email" name="email" placeholder="you@domain.com" required>
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M21.75 6.75v10.5a2.25 2.25 0 01-2.25 2.25h-15a2.25 2.25 0 01-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0019.5 4.5h-15a2.25 2.25 0 00-2.25 2.25m19.5 0v.243a2.25 2.25 0 01-1.07 1.916l-7.5 4.615a2.25 2.25 0 01-2.36 0L3.32 8.91a2.25 2.25 0 01-1.07-1.916V6.75" />
+                </svg>
+              </div>
+            </div>
+
+            <!-- Contact Toggle -->
+            <div class="field">
+              <label>Contact preference (optional)</label>
+              <div class="contact-toggle">
+                <button type="button" class="toggle-btn active" data-contact="email">Email</button>
+                <button type="button" class="toggle-btn" data-contact="phone">Phone</button>
+              </div>
+              
+              <div class="contact-field active" id="emailField">
+                <div class="input-wrapper">
+                  <input type="email" id="contactEmail" name="contactEmail" placeholder="you@domain.com">
+                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M21.75 6.75v10.5a2.25 2.25 0 01-2.25 2.25h-15a2.25 2.25 0 01-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0019.5 4.5h-15a2.25 2.25 0 00-2.25 2.25m19.5 0v.243a2.25 2.25 0 01-1.07 1.916l-7.5 4.615a2.25 2.25 0 01-2.36 0L3.32 8.91a2.25 2.25 0 01-1.07-1.916V6.75" />
+                  </svg>
+                </div>
+              </div>
+              
+              <div class="contact-field" id="phoneField">
+                <div class="input-wrapper">
+                  <input type="tel" id="phone" name="phone" placeholder="+1 (555) 000-0000">
+                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M10.5 1.5H8.25A2.25 2.25 0 006 3.75v16.5a2.25 2.25 0 002.25 2.25h7.5A2.25 2.25 0 0018 20.25V3.75a2.25 2.25 0 00-2.25-2.25H13.5m-3 0V3h3V1.5m-3 0h3m-3 18.75h3" />
+                  </svg>
+                </div>
+              </div>
+            </div>
+
+            <!-- Password -->
+            <div class="field">
+              <label for="password">Create password</label>
+              <div class="input-wrapper">
+                <input type="password" id="password" name="password" placeholder="At least 8 characters" required minlength="8">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M16.5 10.5V6.75a4.5 4.5 0 10-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 002.25-2.25v-6.75a2.25 2.25 0 00-2.25-2.25H6.75a2.25 2.25 0 00-2.25 2.25v6.75a2.25 2.25 0 002.25 2.25z" />
+                </svg>
+              </div>
+              <p id="passwordError" class="error-message" style="display: none;"></p>
+            </div>
+
+            <div class="form-actions">
+              <button type="submit" class="btn btn-next">
+                Continue
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3" />
+                </svg>
+              </button>
+            </div>
+          </form>
+
+          <p class="terms">
+            By continuing, you agree to our <a href="#">Terms of Service</a> and <a href="#">Privacy Policy</a>
+          </p>
+        </div>
+      </div>
+
+      <!-- Step 2: Theme Selection -->
+      <div class="step-panel" data-panel="2">
+        <div class="step-header">
+          <p class="step-label">Step II of II</p>
+          <h1 class="step-title">Choose your <em>aesthetic</em></h1>
+          <p class="step-subtitle">Select a theme that resonates with your creative soul</p>
+        </div>
+
+        <div class="form-card">
+          <form id="themeForm">
+            <div class="theme-grid">
+              <!-- Dark Theme -->
+              <label class="theme-card theme-dark">
+                <input type="radio" name="theme" value="dark">
+                <div class="theme-preview">
+                  <div class="preview-header"></div>
+                  <div class="preview-content">
+                    <div class="preview-line"></div>
+                    <div class="preview-line"></div>
+                    <div class="preview-line"></div>
+                  </div>
+                  <div class="preview-accent"></div>
+                </div>
+                <div class="theme-label">
+                  <p class="theme-name">Midnight</p>
+                  <p class="theme-desc">Dark & refined</p>
+                </div>
+                <div class="theme-check">
+                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5" />
+                  </svg>
+                </div>
+              </label>
+
+              <!-- Light Theme -->
+              <label class="theme-card theme-light">
+                <input type="radio" name="theme" value="light">
+                <div class="theme-preview">
+                  <div class="preview-header"></div>
+                  <div class="preview-content">
+                    <div class="preview-line"></div>
+                    <div class="preview-line"></div>
+                    <div class="preview-line"></div>
+                  </div>
+                  <div class="preview-accent"></div>
+                </div>
+                <div class="theme-label">
+                  <p class="theme-name">Marble</p>
+                  <p class="theme-desc">Light & airy</p>
+                </div>
+                <div class="theme-check">
+                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5" />
+                  </svg>
+                </div>
+              </label>
+
+              <!-- Earth/Green Theme -->
+              <label class="theme-card theme-earth selected">
+                <input type="radio" name="theme" value="earth" checked>
+                <div class="theme-preview">
+                  <div class="preview-header"></div>
+                  <div class="preview-content">
+                    <div class="preview-line"></div>
+                    <div class="preview-line"></div>
+                    <div class="preview-line"></div>
+                  </div>
+                  <div class="preview-accent"></div>
+                </div>
+                <div class="theme-label">
+                  <p class="theme-name">Forest</p>
+                  <p class="theme-desc">Our signature</p>
+                </div>
+                <div class="theme-check">
+                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5" />
+                  </svg>
+                </div>
+              </label>
+            </div>
+
+            <div class="form-actions">
+              <button type="button" class="btn btn-back" id="backBtn">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18" />
+                </svg>
+                Back
+              </button>
+              <button type="submit" class="btn btn-next" id="createBtn">
+                Create Account
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3" />
+                </svg>
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+
+      <!-- Success State -->
+      <div class="success-container">
+        <div class="success-icon">
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5" />
+          </svg>
+        </div>
+        <h2 class="success-title">Welcome to <em>Icarus</em></h2>
+        <p class="success-text">Your account has been created. You're now part of a community dedicated to authentic human creativity.</p>
+        <a href="{{ url_for('dashboard') }}" class="btn-start">Enter the Sanctuary</a>
+      </div>
+    </div>
+  </main>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+  // Store form data
+  let formData = {
+    name: '',
+    email: '',
+    phone: '',
+    password: '',
+    theme: 'earth'
+  };
+
+  // Step navigation
+  const panels = document.querySelectorAll('.step-panel');
+  const progressSteps = document.querySelectorAll('.progress-step');
+  const progressDots = document.querySelectorAll('.progress-dot');
+  const progressLine = document.querySelector('.progress-line');
+  let currentStep = 1;
+
+  function goToStep(step) {
+    // Hide all panels
+    panels.forEach(p => p.classList.remove('active'));
+    
+    // Show target panel
+    document.querySelector(`[data-panel="${step}"]`).classList.add('active');
+    
+    // Update progress
+    progressSteps.forEach((ps, i) => {
+      const stepNum = i + 1;
+      ps.classList.toggle('active', stepNum === step);
+      progressDots[i].classList.toggle('active', stepNum === step);
+      progressDots[i].classList.toggle('completed', stepNum < step);
+    });
+    
+    // Update progress line
+    if (step > 1) {
+      progressLine.classList.add('filled');
+    } else {
+      progressLine.classList.remove('filled');
+    }
+    
+    currentStep = step;
+  }
+
+  // Contact toggle
+  const toggleBtns = document.querySelectorAll('.toggle-btn');
+  const contactFields = document.querySelectorAll('.contact-field');
+
+  toggleBtns.forEach(btn => {
+    btn.addEventListener('click', () => {
+      toggleBtns.forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      
+      const contactType = btn.dataset.contact;
+      contactFields.forEach(f => f.classList.remove('active'));
+      document.getElementById(`${contactType}Field`).classList.add('active');
+    });
+  });
+
+  // Theme selection
+  const themeCards = document.querySelectorAll('.theme-card');
+  themeCards.forEach(card => {
+    card.addEventListener('click', () => {
+      themeCards.forEach(c => c.classList.remove('selected'));
+      card.classList.add('selected');
+      formData.theme = card.querySelector('input').value;
+    });
+  });
+
+  // Step 1 form submission
+  document.getElementById('detailsForm').addEventListener('submit', (e) => {
+    e.preventDefault();
+    
+    // Gather data
+    formData.name = document.getElementById('name').value.trim();
+    formData.email = document.getElementById('email').value.trim();
+    formData.phone = document.getElementById('phone').value.trim();
+    formData.password = document.getElementById('password').value;
+
+    // Validate password
+    if (formData.password.length < 8) {
+      document.getElementById('passwordError').textContent = 'Password must be at least 8 characters';
+      document.getElementById('passwordError').style.display = 'block';
+      return;
+    }
+    document.getElementById('passwordError').style.display = 'none';
+
+    goToStep(2);
+  });
+
+  // Back button
+  document.getElementById('backBtn').addEventListener('click', () => {
+    goToStep(1);
+  });
+
+  // Step 2 form submission (Create Account)
+  document.getElementById('themeForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    
+    const createBtn = document.getElementById('createBtn');
+    createBtn.disabled = true;
+    createBtn.innerHTML = 'Creating... <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" width="20" height="20"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>';
+
+    try {
+      const response = await fetch('/api/signup', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(formData)
+      });
+
+      const data = await response.json();
+
+      if (data.success) {
+        // Hide panels and show success
+        panels.forEach(p => p.classList.remove('active'));
+        document.querySelector('.progress').style.display = 'none';
+        document.querySelector('.success-container').classList.add('active');
+        
+        // Update the success link if redirect URL is provided
+        if (data.redirect) {
+          document.querySelector('.btn-start').href = data.redirect;
+        }
+      } else {
+        alert(data.error || 'Something went wrong. Please try again.');
+        createBtn.disabled = false;
+        createBtn.innerHTML = 'Create Account <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" width="20" height="20"><path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3" /></svg>';
+      }
+    } catch (err) {
+      alert('Network error. Please try again.');
+      createBtn.disabled = false;
+      createBtn.innerHTML = 'Create Account <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" width="20" height="20"><path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3" /></svg>';
+    }
+  });
+</script>
+{% endblock %}
