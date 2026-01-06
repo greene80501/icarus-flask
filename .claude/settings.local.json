@@ -13,7 +13,8 @@
       "Bash(fi)",
       "Bash(.venv/Scripts/python:*)",
       "Bash(python update_posts_display.py:*)",
-      "Bash(python update_explore_layout.py:*)"
+      "Bash(python update_explore_layout.py:*)",
+      "Bash(python:*)"
     ]
   }
 }

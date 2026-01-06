@@ -272,15 +272,20 @@ def feed(theme=None):
 @app.route('/settings')
 @login_required
 def settings():
-    return render_template('settings.html', user=current_user)
+    # Redirect to feed with settings modal auto-open parameter
+    theme = current_user.theme if current_user.is_authenticated else 'earth'
+    return redirect(url_for('feed', theme=theme, open_settings='true'))
 
 
 @app.route('/explore')
+@app.route('/explore/<theme>')
 @login_required
-def explore():
+def explore(theme=None):
+    if theme is None:
+        theme = current_user.theme if current_user.is_authenticated else 'earth'
+
     posts = Post.query.order_by(Post.created_at.desc()).limit(50).all()
 
-    theme = current_user.theme
     theme_map = {
         'dark': 'dark/explore.html',
         'light': 'light/explore.html',
@@ -293,13 +298,16 @@ def explore():
 
 
 @app.route('/bookmarks')
+@app.route('/bookmarks/<theme>')
 @login_required
-def bookmarks_page():
+def bookmarks_page(theme=None):
+    if theme is None:
+        theme = current_user.theme if current_user.is_authenticated else 'earth'
+
     bookmarked_posts = Post.query.join(Bookmark).filter(
         Bookmark.user_id == current_user.id
     ).order_by(Bookmark.created_at.desc()).all()
 
-    theme = current_user.theme
     theme_map = {
         'dark': 'dark/bookmarks.html',
         'light': 'light/bookmarks.html',
@@ -312,17 +320,14 @@ def bookmarks_page():
 
 
 @app.route('/profile')
-@app.route('/profile/<username>')
+@app.route('/profile/<theme>')
 @login_required
-def profile(username=None):
-    if username:
-        user = User.query.filter_by(username=username).first_or_404()
-    else:
-        user = current_user
+def profile(theme=None):
+    if theme is None:
+        theme = current_user.theme if current_user.is_authenticated else 'earth'
 
-    posts = Post.query.filter_by(user_id=user.id).order_by(Post.created_at.desc()).all()
+    posts = Post.query.filter_by(user_id=current_user.id).order_by(Post.created_at.desc()).all()
 
-    theme = current_user.theme
     theme_map = {
         'dark': 'dark/profile.html',
         'light': 'light/profile.html',
@@ -331,7 +336,7 @@ def profile(username=None):
     }
     template = theme_map.get(theme, 'forest/profile.html')
 
-    return render_template(template, user=current_user, current_theme=theme, posts=posts, profile_user=user, page_title=f"{user.get_display_name()}'s Profile")
+    return render_template(template, user=current_user, current_theme=theme, posts=posts, page_title=f"{current_user.get_display_name()}'s Profile")
 
 
 @app.route('/logout')
